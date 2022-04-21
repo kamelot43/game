@@ -1,13 +1,13 @@
 import './App.css';
 import { Routes, Route} from "react-router-dom";
 import Welcome from "./Welcome.js";
-import Result from "./Result.js";
+import Game from "./Game.js";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Welcome />} />
-      <Route path="result" element={<Result />} />
+      <Route path="game" element={<Game />} />
     </Routes>
   );
 }

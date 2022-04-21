@@ -3,7 +3,7 @@ import "./Card.scss";
 import PropTypes from "prop-types";
 
 const Card = ({data = []}) => {
-  const {albumId, id, title, url, thumbnailUrl} = data;
+  const {albumId, id, title, url} = data;
 
   return (
     <div className="card">
@@ -11,7 +11,6 @@ const Card = ({data = []}) => {
       <div>id is {id}</div>
       <div>title is {title}</div>
       <img src={url} alt="" width={150} height={150}/>
-      <img src={thumbnailUrl} alt="" width={150} height={150}/>
     </div>
 )}
 
@@ -21,7 +20,6 @@ Card.propTypes = {
     id: PropTypes.number,
     title: PropTypes.string,
     url: PropTypes.string,
-    thumbnailUrl: PropTypes.string,
   })
 }
 

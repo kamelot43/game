@@ -1,0 +1,26 @@
+.game {
+
+  &__wrapper {
+    display: grid;
+    grid-gap: 15px;
+
+    &_easy {
+      max-width: 400px;
+      grid-template-columns: auto auto;
+    }
+    &_normal {
+      max-width: 600px;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    &_hard {
+      max-width: 800px;
+      grid-template-columns: 1fr 1fr 1fr  1fr;
+    }
+  }
+
+  .container {
+    width: 1250px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+}
