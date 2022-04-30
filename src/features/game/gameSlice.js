@@ -1,13 +1,46 @@
 
 const initialState = {
   difficultyLevel: 'easy',
-  round: 0,
+  gameStatus: 'progress',
+  round: 1,
   rightAnswers: 0,
+  rightAnswersSet: new Set(),
   currentPictureId: null,
 }
 
 export default function gameReducer(state = initialState, action) {
   switch (action.type) {
+    case 'game/checkGameStatus': {
+      if (
+        (state.rightAnswers === 2) && (state.difficultyLevel === 'easy') ||
+        (state.rightAnswers === 3) && (state.difficultyLevel === 'normal') ||
+        (state.rightAnswers === 4) && (state.difficultyLevel === 'hard')
+      )
+      {
+        return {
+          ...state,
+          gameStatus: 'win',
+        }
+      }
+      return state
+    }
+    case 'game/gameOverStatus': {
+
+      return {
+        ...state,
+        gameStatus: 'loose',
+        rightAnswers: 0,
+        round: state.round +=1,
+      }
+    }
+    case 'game/newGameStatus': {
+
+      return {
+        ...state,
+        gameStatus: 'progress',
+        rightAnswers: 0,
+      }
+    }
     case 'game/chooseGameDifficulty': {
 
       return {
@@ -20,6 +53,13 @@ export default function gameReducer(state = initialState, action) {
       return {
         ...state,
         currentPictureId: action.payload,
+      }
+    }
+    case 'game/addRightAnswersArray': {
+
+      return {
+        ...state,
+        rightAnswersArray: [...this.state.rightAnswersArray, action.payload],
       }
     }
     case 'game/increaseGameCounter': {
@@ -47,7 +87,7 @@ export default function gameReducer(state = initialState, action) {
 
       return {
         ...state,
-        round: 0,
+        round: 1,
       }
     }
     default:

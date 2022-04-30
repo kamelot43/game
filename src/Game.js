@@ -16,11 +16,14 @@ export default function Game() {
 
   const dispatch = useDispatch();
   const roundCounter = useSelector((state) => state.game.round);
-  const increaseRoundCounter = () => dispatch({ type: 'game/increaseGameCounter', payload: {}});
   const increaseRightAnswersCounter = () => dispatch({ type: 'game/increaseRightAnswers', payload: {}});
-  const clearRightAnswersCounter = () => dispatch({ type: 'game/clearRightAnswers', payload: {}});
+  const checkGameStatus = () => dispatch({ type: 'game/checkGameStatus', payload: {}});
+  const gameOverStatus = () => dispatch({ type: 'game/gameOverStatus', payload: {}});
+  const newGameStatus = () => dispatch({ type: 'game/newGameStatus', payload: {}});
+  const clearGameCounter = () => dispatch({ type: 'game/clearGameCounter', payload: {}});
   const currentDifficultyLevel = useSelector((state) => state.game.difficultyLevel);
   const rightAnswersCounter = useSelector((state) => state.game.rightAnswers);
+  const gameStatus = useSelector((state) => state.game.gameStatus);
 
   const EASY_LEVEL_BOARD_SIZE = 2;
   const NORMAL_LEVEL_BOARD_SIZE = 3;
@@ -57,10 +60,10 @@ export default function Game() {
 
   const prepareData = PrepareBoard();
 
-  const visitedPostItem = uuid => {
+  const visitedPostItem = payload => {
 
     let cloneData = [...data];
-    let indexOfItem = cloneData.findIndex(item => item.uuid === uuid);
+    let indexOfItem = cloneData.findIndex(item => item.uuid === payload.uuid);
 
     cloneData[indexOfItem] = {
       ...cloneData[indexOfItem],
@@ -70,31 +73,24 @@ export default function Game() {
     setData(cloneData);
   };
 
-  const checkGameStatus = (it) => {
-    console.log(it)
-    // if (currentDifficultyLevel === 'easy' && rightAnswersCounter === EASY_LEVEL_BOARD_SIZE) {
-    //   alert(`Поздравляем ! Игра пройдена. Текущий уровень сложности ${currentDifficultyLevel}. Правильных ответов : ${rightAnswersCounter}`);
-    // } else if (currentDifficultyLevel === 'normal' && rightAnswersCounter === NORMAL_LEVEL_BOARD_SIZE) {
-    //   alert(`Поздравляем ! Игра пройдена. Текущий уровень сложности ${currentDifficultyLevel}. Правильных ответов : ${rightAnswersCounter}`);
-    // } else if (currentDifficultyLevel === 'hard' && rightAnswersCounter === HARD_LEVEL_BOARD_SIZE) {
-    //   alert(`Поздравляем ! Игра пройдена. Текущий уровень сложности ${currentDifficultyLevel}. Правильных ответов : ${rightAnswersCounter}`);
-    // }
-  };
 
-  const checkActiveIndex = uuid => {
+  const checkActiveIndex = payload => {
+    if(gameStatus === 'progress') {
+      let indexOfItem = data.findIndex(item => item.uuid === payload.uuid);
+      const target = data[indexOfItem];
 
-    let indexOfItem = data.findIndex(item => item.uuid === uuid);
-    const target = data[indexOfItem];
-
-    if(activeIndex === null) {
-      setActiveIndex(target.id);
-    } else if (activeIndex === target.id)  {
-      setActiveIndex(null);
-      increaseRightAnswersCounter();
-    } else if (activeIndex !== target.id) {
-      alert('Игра окончена');
-      setActiveIndex(null);
-      clearRightAnswersCounter();
+      if(activeIndex === null) {
+        setActiveIndex(
+          {'id': target.id, 'uuid': target.uuid}
+        );
+      } else if (activeIndex.id === target.id && activeIndex.uuid !== target.uuid) {
+        setActiveIndex(null);
+        increaseRightAnswersCounter();
+        checkGameStatus();
+      } else if (activeIndex.id !== target.id && activeIndex.uuid !== target.uuid) {
+        gameOverStatus();
+        setActiveIndex(null);
+      }
     }
   };
 
@@ -112,16 +108,32 @@ export default function Game() {
           <p>You can do this, I believe in you.</p>
           <div>Round : {roundCounter}</div>
           <div>Right Answers Counter : {rightAnswersCounter}</div>
-          <button
-            onClick={() => {
-              setData(prepareData);
-              setActiveIndex(null);
-              increaseRoundCounter();
-            }
+          <div>Game status is {gameStatus}</div>
+          {gameStatus === 'win' &&
+            <button
+              onClick={() => {
+                setData(prepareData);
+                setActiveIndex(null);
+                clearGameCounter();
+                newGameStatus();
+                }
+              }
+            >
+              Повторить игру
+            </button>
           }
-          >
-            Обновить данные
-          </button>
+          {gameStatus === 'loose' &&
+            <button
+              onClick={() => {
+                setData(prepareData);
+                setActiveIndex(null);
+                newGameStatus();
+                }
+              }
+            >
+              Следующий раунд
+            </button>
+          }
           <div
             className={`game__wrapper game__wrapper_${currentDifficultyLevel}`}
           >
@@ -130,10 +142,9 @@ export default function Game() {
                 <Card
                   key={uuidv4()}
                   data={element}
-                  onClick={(uuid) =>{
-                    visitedPostItem(uuid);
-                    checkActiveIndex(uuid);
-                    checkGameStatus(rightAnswersCounter);
+                  onClickHandler={(payload) =>{
+                    visitedPostItem(payload);
+                    checkActiveIndex(payload);
                   }}
                 />
               )
