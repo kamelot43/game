@@ -2,7 +2,6 @@ import {HTTP} from "../../http-common";
 
 const initialState = {
   photos: [],
-  preparedPhotos: []
 }
 
 export default function photosReducer(state = initialState, action) {

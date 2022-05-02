@@ -1,6 +1,7 @@
 import {Link} from "react-router-dom";
 import {useSelector, useDispatch} from 'react-redux';
 import React, { useEffect } from 'react';
+import Button from "./components/Button/Button";
 
 export default function Welcome() {
   const dispatch = useDispatch();
@@ -14,7 +15,7 @@ export default function Welcome() {
   useEffect(() => {
     newGameStatus();
     clearGameCounter();
-  }, []);
+  });
 
   return (
     <div>
@@ -25,13 +26,15 @@ export default function Welcome() {
           <h2>current difficulty level is {currentDifficultyLevel}</h2>
 
           <div>
-            <button type="button" className="button" onClick={easyDifficulty}>2 x 2</button>
-            <button type="button" className="button" onClick={normalDifficulty}>3 x 3</button>
-            <button type="button" className="button" onClick={hardDifficulty}>4 x 4</button>
+            <Button onClickHandler={easyDifficulty} type="green" text="2 x 2" isActive={currentDifficultyLevel === 'easy'}/>
+            <Button onClickHandler={normalDifficulty} type="blue" text="3 x 3" isActive={currentDifficultyLevel === 'normal'}/>
+            <Button onClickHandler={hardDifficulty} type="red" text="4 x 4"  isActive={currentDifficultyLevel === 'hard'}/>
           </div>
         </main>
         <nav>
-          <Link to="/game">Play</Link>
+          <Link to="/game">
+            <Button type="black" text="PLAY"/>
+          </Link>
         </nav>
       </div>
     </div>

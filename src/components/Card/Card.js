@@ -15,7 +15,6 @@ const Card = ({data = [],  onClickHandler = () => {}}) => {
     >
       <div className="card__inner">
         <div className="card__front">
-          <div className="card__uuid">{uuid}</div>
           <img src={url} alt="/"/>
         </div>
         <div className="card__back">
@@ -27,7 +26,7 @@ const Card = ({data = [],  onClickHandler = () => {}}) => {
 
 Card.propTypes = {
   data: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.number,
     uuid: PropTypes.string,
     visited: PropTypes.bool,
     url: PropTypes.string,

@@ -1,4 +1,3 @@
-import {Link} from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux'
 import Card from "./components/Card/Card";
 import React, { useEffect, useState } from 'react';
@@ -10,19 +9,20 @@ import "./Game.scss";
 import {shuffle} from "./lib/ shuffle";
 import { v4 as uuidv4 } from 'uuid';
 
+//components
+import Aside from "./components/Aside/Aside";
+
 export default function Game() {
   const [data, setData] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
 
   const dispatch = useDispatch();
-  const roundCounter = useSelector((state) => state.game.round);
   const increaseRightAnswersCounter = () => dispatch({ type: 'game/increaseRightAnswers', payload: {}});
   const checkGameStatus = () => dispatch({ type: 'game/checkGameStatus', payload: {}});
   const gameOverStatus = () => dispatch({ type: 'game/gameOverStatus', payload: {}});
   const newGameStatus = () => dispatch({ type: 'game/newGameStatus', payload: {}});
   const clearGameCounter = () => dispatch({ type: 'game/clearGameCounter', payload: {}});
   const currentDifficultyLevel = useSelector((state) => state.game.difficultyLevel);
-  const rightAnswersCounter = useSelector((state) => state.game.rightAnswers);
   const gameStatus = useSelector((state) => state.game.gameStatus);
 
   const EASY_LEVEL_BOARD_SIZE = 2;
@@ -55,7 +55,6 @@ export default function Game() {
       });
       return shuffle(transformData);
     });
-    return post;
   }
 
   const prepareData = PrepareBoard();
@@ -73,17 +72,16 @@ export default function Game() {
     setData(cloneData);
   };
 
-
   const checkActiveIndex = payload => {
     if(gameStatus === 'progress') {
       let indexOfItem = data.findIndex(item => item.uuid === payload.uuid);
       const target = data[indexOfItem];
 
-      if(activeIndex === null) {
+      if(activeIndex === null && target.visited !== true) {
         setActiveIndex(
           {'id': target.id, 'uuid': target.uuid}
         );
-      } else if (activeIndex.id === target.id && activeIndex.uuid !== target.uuid) {
+      } else if (activeIndex.id === target.id && activeIndex.uuid !== target.uuid && target.visited !== true) {
         setActiveIndex(null);
         increaseRightAnswersCounter();
         checkGameStatus();
@@ -103,57 +101,39 @@ export default function Game() {
   return (
     <div className="game">
       <div className="container">
-        <main>
-          <h2>Game Page !</h2>
-          <p>You can do this, I believe in you.</p>
-          <div>Round : {roundCounter}</div>
-          <div>Right Answers Counter : {rightAnswersCounter}</div>
-          <div>Game status is {gameStatus}</div>
-          {gameStatus === 'win' &&
-            <button
-              onClick={() => {
-                setData(prepareData);
-                setActiveIndex(null);
-                clearGameCounter();
-                newGameStatus();
-                }
-              }
-            >
-              Повторить игру
-            </button>
-          }
-          {gameStatus === 'loose' &&
-            <button
-              onClick={() => {
-                setData(prepareData);
-                setActiveIndex(null);
-                newGameStatus();
-                }
-              }
-            >
-              Следующий раунд
-            </button>
-          }
-          <div
-            className={`game__wrapper game__wrapper_${currentDifficultyLevel}`}
+        <div className="game__aside">
+          <Aside
+            winStatusClickHandler={() => {
+              setData(prepareData);
+              setActiveIndex(null);
+              clearGameCounter();
+              newGameStatus();
+            }}
+            looseStatusClickHandler={() => {
+              setData(prepareData);
+              setActiveIndex(null);
+              newGameStatus();
+            }}
           >
-            {data.length > 0 && data.map((element, index) => {
-              return (
-                <Card
-                  key={uuidv4()}
-                  data={element}
-                  onClickHandler={(payload) =>{
-                    visitedPostItem(payload);
-                    checkActiveIndex(payload);
-                  }}
-                />
-              )
-            })}
-          </div>
-        </main>
-        <nav>
-          <Link to="/">Main</Link>
-        </nav>
+          </Aside>
+        </div>
+
+        <div
+          className={`game__wrapper game__wrapper_${currentDifficultyLevel}`}
+        >
+          {data.length > 0 && data.map((element) => {
+            return (
+              <Card
+                key={uuidv4()}
+                data={element}
+                onClickHandler={(payload) =>{
+                  visitedPostItem(payload);
+                  checkActiveIndex(payload);
+                }}
+              />
+            )
+          })}
+        </div>
       </div>
     </div>
   );
