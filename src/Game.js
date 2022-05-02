@@ -55,6 +55,7 @@ export default function Game() {
       });
       return shuffle(transformData);
     });
+    return post;
   }
 
   const prepareData = PrepareBoard();
