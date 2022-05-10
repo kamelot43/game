@@ -61,17 +61,27 @@ export default function Game() {
   const prepareData = PrepareBoard();
 
   const visitedPostItem = payload => {
+    if(gameStatus === 'progress') {
+      let cloneData = [...data];
+      let indexOfItem = cloneData.findIndex(item => item.uuid === payload.uuid);
 
-    let cloneData = [...data];
-    let indexOfItem = cloneData.findIndex(item => item.uuid === payload.uuid);
+      cloneData[indexOfItem] = {
+        ...cloneData[indexOfItem],
+        visited: true
+      };
 
-    cloneData[indexOfItem] = {
-      ...cloneData[indexOfItem],
-      visited: true
-    };
-
-    setData(cloneData);
+      setData(cloneData);
+    }
   };
+
+  const clearVisitedStatus = () => {
+    let cloneData = [...data];
+    const transformData = cloneData.map((it) => {
+      return Object.assign(it, {'visited' : false});
+    });
+
+    setData(transformData);
+  }
 
   const checkActiveIndex = payload => {
     if(gameStatus === 'progress') {
@@ -111,7 +121,7 @@ export default function Game() {
               newGameStatus();
             }}
             looseStatusClickHandler={() => {
-              setData(prepareData);
+              clearVisitedStatus();
               setActiveIndex(null);
               newGameStatus();
             }}
